@@ -19,6 +19,7 @@ Tools (also known as "functions" or "plugins") let AI models:
 3. Use the results to enhance their responses
 
 Common use cases include:
+
 - Retrieving real-time data
 - Performing calculations
 - Accessing databases
@@ -31,11 +32,13 @@ Tools are defined as Ruby classes that inherit from `RubyLLM::Tool`:
 ```ruby
 class Weather < RubyLLM::Tool
   description "Gets current weather for a location"
-  param :latitude, desc: "Latitude (e.g., 52.5200)"
-  param :longitude, desc: "Longitude (e.g., 13.4050)"
+  param :latitude, desc: "Latitude (e.g., 52.5200)", required: true
+  param :longitude, desc: "Longitude (e.g., 13.4050)", required: true
+  param :unit, enum: %w[celsius fahrenheit]
 
-  def execute(latitude:, longitude:)
-    url = "https://api.open-meteo.com/v1/forecast?latitude=#{latitude}&longitude=#{longitude}&current=temperature_2m,wind_speed_10m"
+  def execute(latitude:, longitude:, unit: 'celsius')
+    url = "https://api.open-meteo.com/v1/forecast?latitude=#{latitude}&longitude=#{longitude}&" \
+      "current=temperature_2m,wind_speed_10m&temperature_unit=#{unit}"
 
     response = Faraday.get(url)
     data = JSON.parse(response.body)
@@ -62,6 +65,7 @@ param :parameter_name,
   type: :string,          # Data type (:string, :integer, :boolean, :array, :object)
   desc: "Description",    # Description of what the parameter does
   required: true          # Whether the parameter is required (default: true)
+  enum: ["foo", "bar"]    # An optional list of enumerated values (default: nil)
 ```
 
 ## Using Tools in Chat
@@ -247,9 +251,9 @@ end
 
 When implementing tools that process user input (via the AI):
 
-* Avoid using `eval`, `system` or similar methods with unsanitized input
-* Remember that AI models might be tricked into producing dangerous inputs
-* Validate all inputs and use appropriate sanitization
+- Avoid using `eval`, `system` or similar methods with unsanitized input
+- Remember that AI models might be tricked into producing dangerous inputs
+- Validate all inputs and use appropriate sanitization
 
 ## When to Use Tools
 

@@ -10,9 +10,10 @@ RSpec.describe RubyLLM::Chat do
     description 'Gets current weather for a location'
     param :latitude, desc: 'Latitude (e.g., 52.5200)'
     param :longitude, desc: 'Longitude (e.g., 13.4050)'
+    param :unit, enum: %w[C F]
 
-    def execute(latitude:, longitude:)
-      "Current weather at #{latitude}, #{longitude}: 15°C, Wind: 10 km/h"
+    def execute(latitude:, longitude:, unit: 'C')
+      "Current weather at #{latitude}, #{longitude}: 15°#{unit}, Wind: 10 km/h"
     end
   end
 
